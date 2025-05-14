@@ -51,4 +51,53 @@ class DatabaseHandler {
             return false;
         }
     }
+
+
+
+
+    //////////// CHECKS IF A VALUE EXISTS OR NOT /////////////////////////////
+    public function is_existing(string $table, string $column, $value): bool {
+        try {
+
+
+            // Build the SQL query dynamically
+            if ($value === null) {
+                $sql = "SELECT EXISTS(SELECT 1 FROM $table WHERE $column IS NULL)";
+            } else {
+                $sql = "SELECT EXISTS(SELECT 1 FROM $table WHERE $column = :value)";
+            }
+        
+            // Prepare and execute the query
+            $stmt = $this->pdo->prepare($sql);
+        
+            if ($value !== null) {
+                $stmt->bindValue(':value', $value);
+            }
+        
+            $stmt->execute();
+        
+            // Fetch the result and return as boolean
+            return (bool) $stmt->fetchColumn();
+            
+            // $sql = "SELECT EXISTS(SELECT 1 FROM $table WHERE $column = $value)";
+            // $stmt = $this->pdo->prepare($sql);
+            // $stmt->execute();
+
+            // $exists = $stmt->fetchColumn();
+
+            // if($exists){
+            //     return true;
+            // }
+            // else{
+            //     return false;
+            // }
+
+
+        } catch (\PDOException $e) {
+            error_log("Database insert error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
 }
