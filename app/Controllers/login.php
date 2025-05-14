@@ -54,27 +54,92 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             password: ''
         );
 
-        $user_exists = $database->is_existing("customers", "email", $email);
+        // $user_exists = $database->is_existing("customers", "email", $email);
+        $authentication = $database->authenticateUser("customers", "email", "phone", $email, $password);
 
-        if($user_exists == true){
+        if($authentication == 0){
             $json_response = [
-                'status' => 'sucess',
+                'status' => 'sucess-user',
                 'message' => 'redirect to users page'
             ];
             echo json_encode($json_response);
             exit(0);
         }
-        else{
+        else if($authentication == 1){
             $json_response = [
                 'status' => 'fail',
-                'message' => 'You need to Register first'
+                'message' => 'Wrong Password'
+            ];
+            echo json_encode($json_response);
+            exit(1);
+        }
+        else if($authentication == 2){
+            $json_response = [
+                'status' => 'fail',
+                'message' => 'User does not exist'
             ];
             echo json_encode($json_response);
             exit(1);
         }
 
 
-    }else{
+    }
+    else if($data['action'] == "login-as-admin"){
+
+        $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
+        $password = $data['password'];
+
+
+        //////// SANITIZATION ////////////
+
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            $json_response = [
+                'status' => 'fail',
+                'message' => 'Invalid Email'
+            ];
+            echo json_encode($json_response);
+            //http_response_code(200); // Bad Request
+            exit(1);
+        }
+
+        $database = new App\Models\DatabaseHandler(
+
+            host: 'localhost',
+            dbname: 'test2',
+            username: 'root',
+            password: ''
+        );
+
+        // $user_exists = $database->is_existing("customers", "email", $email);
+        $authentication = $database->authenticateUser("admins", "email", "password", $email, $password);
+
+        if($authentication == 0){
+            $json_response = [
+                'status' => 'sucess-admin',
+                'message' => 'redirect to admin page'
+            ];
+            echo json_encode($json_response);
+            exit(0);
+        }
+        else if($authentication == 1){
+            $json_response = [
+                'status' => 'fail',
+                'message' => 'Wrong Password'
+            ];
+            echo json_encode($json_response);
+            exit(1);
+        }
+        else if($authentication == 2){
+            $json_response = [
+                'status' => 'fail',
+                'message' => 'User does not exist'
+            ];
+            echo json_encode($json_response);
+            exit(1);
+        }
+
+    }
+    else{
         http_response_code(400); // Bad Request
         exit();
     }

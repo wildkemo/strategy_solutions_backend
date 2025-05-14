@@ -79,25 +79,51 @@ class DatabaseHandler {
             // Fetch the result and return as boolean
             return (bool) $stmt->fetchColumn();
             
-            // $sql = "SELECT EXISTS(SELECT 1 FROM $table WHERE $column = $value)";
-            // $stmt = $this->pdo->prepare($sql);
-            // $stmt->execute();
-
-            // $exists = $stmt->fetchColumn();
-
-            // if($exists){
-            //     return true;
-            // }
-            // else{
-            //     return false;
-            // }
-
 
         } catch (\PDOException $e) {
             error_log("Database insert error: " . $e->getMessage());
             return false;
         }
     }
+
+
+
+    ////////// AUTHENTICATION ///////////////
+
+    public function authenticateUser(string $table, string $keyColumn, string $authColumn, $keyValue, $authValue): int {
+        try {
+
+            $sql = "SELECT $authColumn FROM $table WHERE $keyColumn = :keyvalue";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':keyvalue', $keyValue);
+            $stmt->execute();
+
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if($result){
+
+                if($authValue === $result[$authColumn]){
+
+                    return 0;
+
+                }
+                else{
+
+                    return 1;
+
+                }
+
+            }
+            else{
+                return 2;
+            }            
+
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            return false;
+        }
+    }
+
 
 
 }
