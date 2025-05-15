@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         );
 
         // $user_exists = $database->is_existing("customers", "email", $email);
-        $authentication = $database->authenticateUser("customers", "email", "phone", $email, $password);
+        $authentication = $database->authenticateUser("customers", "email", "password", $email, $password);
 
         if($authentication == 0){
             $json_response = [

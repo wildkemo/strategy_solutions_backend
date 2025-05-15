@@ -6,7 +6,9 @@ abstract class User {
     protected $id;
     protected $name;
     protected $email;
-    protected $phone;
+    protected $password;
+
+    // protected $phone;
 
     public function getId() {
         return $this->id;
@@ -32,11 +34,11 @@ abstract class User {
         $this->email = $email;
     }
 
-    public function getPhone(): string {
-        return $this->phone;
+    public function getPassword(): string {
+        return $this->password;
     }
 
-    public function setPhone(string $phone): void {
-        $this->phone = $phone;
+    public function setPassword(string $password): void {
+        $this->password = $password;
     }
 }

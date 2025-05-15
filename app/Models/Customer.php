@@ -3,42 +3,54 @@
 namespace App\Models;
 
 class Customer extends User {
-    protected $service_type;
-    protected $service_description;
+    protected $gender;
+    protected $phone;
 
-    public function getServiceType(): string {
-        return $this->service_type;
+    public function getPhone(): string {
+        return $this->phone;
     }
 
-    public function setServiceType(string $service_type): void {
-        $this->service_type = $service_type;
+    public function setPhone(string $phone): void {
+        $this->phone = $phone;
     }
 
-    public function getServiceDescription(): string {
-        return $this->service_description;
+    public function getGender(): string {
+        return $this->gender;
     }
 
-    public function setServiceDescription(string $service_description): void {
-        $this->service_description = $service_description;
+    public function setGender(string $gender): void {
+        $this->gender = $gender;
     }
 
-    /**
-     * Adds the customer to the database using the DatabaseHandler class.
-     *
-     * @param DatabaseHandler $dbHandler
-     * @return bool True if successful, false otherwise.
-     */
-    public function addCustomerToDB(DatabaseHandler $dbHandler): bool {
-        $data = [
-            //'id' => $this->getId(),
-            'name' => $this->getName(),
-            'email' => $this->getEmail(),
-            'phone' => $this->getPhone(),
-            'service_type' => $this->getServiceType(),
-            'service_description' => $this->getServiceDescription(),
-        ];
+    
+
+    
+    public function addToDB(DatabaseHandler $dbHandler): int {
+        $email = $this->getEmail();
+        $exists = $dbHandler->is_existing("customers", "email", $email);
+    
+        if(!$exists){
+           
+            $data = [
+                'name' => $this->getName(),
+                'email' => $this->getEmail(),
+                'password' => $this->getPassword(), // No hashing
+                'phone' => $this->getPhone(),
+                'gender' => $this->getGender()
+            ];
         
+            $op = $dbHandler->insert('customers', $data);
 
-        return $dbHandler->insert('customers', $data);
+            if($op == true){
+                return 0;
+            }else{
+                return 1;
+            }
+
+        }else{
+            return 2;
+        }
+    
+        
     }
 }

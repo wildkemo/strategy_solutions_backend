@@ -32,6 +32,7 @@ class DatabaseHandler {
      * @return bool True if successful, false otherwise.
      */
     public function insert(string $table, array $data): bool {
+        
         try {
             // Build the SQL query dynamically
             $columns = implode(', ', array_keys($data));
@@ -120,7 +121,7 @@ class DatabaseHandler {
 
         } catch (\PDOException $e) {
             error_log("Database error: " . $e->getMessage());
-            return false;
+            return 3;
         }
     }
 

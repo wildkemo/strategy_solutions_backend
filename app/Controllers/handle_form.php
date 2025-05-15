@@ -104,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customer->setName($Cname);
             $customer->setEmail($Cemail);
             $customer->setPhone($Cphone);
-            $customer->setServiceType($Cservice_type);
-            $customer->setServiceDescription($Cservice_description);
+            // $customer->setServiceType($Cservice_type);
+            // $customer->setServiceDescription($Cservice_description);
 
 
 
@@ -154,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Add the customer to the database
-            if ($customer->addCustomerToDB($dbHandler)) {
+            if ($customer->addToDB($dbHandler)) {
 
                 $userResponse = [
                     'databaseSucess' => 'true',
