@@ -127,4 +127,37 @@ class DatabaseHandler {
 
 
 
+
+
+
+
+
+    public function getAllRecords(string $tableName): array {
+        
+        $stmt = $this->pdo->prepare("SELECT * FROM `$tableName`");
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if($tableName == "services"){
+            // Convert JSON features to PHP arrays
+            foreach ($results as &$row) {
+            if (isset($row['features'])) {
+                $row['features'] = json_decode($row['features'], true);
+            }
+        }
+
+    }
+        
+        return $results;
+    }
+
+
+
+
+
+
+
+
+
 }
