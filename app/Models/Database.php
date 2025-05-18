@@ -147,7 +147,7 @@ class DatabaseHandler {
             }
         }
 
-    }
+        }
         
         return $results;
     }
@@ -155,7 +155,26 @@ class DatabaseHandler {
 
 
 
-
+    public function getRecordByColumn(string $tableName, string $column, $value): array {
+        // Prepare the SQL query with a WHERE clause to filter by the specified column and value
+        $stmt = $this->pdo->prepare("SELECT * FROM `$tableName` WHERE `$column` = :value");
+        $stmt->bindValue(':value', $value); // Bind the value safely to prevent SQL injection
+        $stmt->execute();
+    
+        // Fetch all matching records
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    
+        // If the table is "services", decode the JSON features into PHP arrays
+        if ($tableName === "services") {
+            foreach ($results as &$row) {
+                if (isset($row['features'])) {
+                    $row['features'] = json_decode($row['features'], true);
+                }
+            }
+        }
+    
+        return $results;
+    }
 
 
 
