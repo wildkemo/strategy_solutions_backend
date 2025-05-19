@@ -40,11 +40,17 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     $op = $service->addToDB($database);
 
     if($op == 0){
-        echo json_encode(["status" => "success"]);
+        echo json_encode([
+            "status" => "success",
+            'message'=> 'added successfully'
+        ]);
         http_response_code(200);
         exit();
     }else{
-        echo json_encode(["status" => "error"]);
+        echo json_encode([
+            "status" => "error",
+            'message'=> 'added successfully'
+        ]);
         exit();
     }
 
