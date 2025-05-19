@@ -156,8 +156,11 @@ class DatabaseHandler {
 
 
     public function getRecordByColumn(string $tableName, string $column, $value): array {
+
+        $sql = "SELECT * FROM $tableName WHERE $column = :value";
+
         // Prepare the SQL query with a WHERE clause to filter by the specified column and value
-        $stmt = $this->pdo->prepare("SELECT * FROM `$tableName` WHERE `$column` = :value");
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':value', $value); // Bind the value safely to prevent SQL injection
         $stmt->execute();
     
@@ -174,9 +177,25 @@ class DatabaseHandler {
         }
     
         return $results;
+        
     }
 
 
+
+
+
+
+    public function getOneValue(string $tableName, string $column, string $whereColumn, $keyvalue): ?string
+{
+    $sql = "SELECT $column FROM $tableName WHERE $whereColumn = :keyvalue LIMIT 1";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->bindValue(':keyvalue', $keyvalue);
+    $stmt->execute();
+
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    return $result[$column] ?? null;
+}
 
 
 }

@@ -57,11 +57,11 @@ public function setServiceDescription(string $service_description): void
         
         $exists = $dbHandler->is_existing("customers", "email", $this->getEmail());
     
-        if($exists){
+        if($exists == true){
 
-            $record = $dbHandler->getRecordByColumn("customers", "name", $this->getName());
+            $fetchedname = $dbHandler->getOneValue("customers", "name", "email", $this->getEmail());
+            $this->setName($fetchedname);
 
-            $this->setName($record['name']);
            
             $data = [
                 'name' => $this->getName(),
@@ -69,6 +69,13 @@ public function setServiceDescription(string $service_description): void
                 'service_description' => $this->getServiceDescription(),
                 'service_type' => $this->getServiceType(),
             ];
+
+            // $data = [
+            //     'name' => 'kariiim',
+            //     'email' => 'karim@gmail.com',
+            //     'service_description' => 'ssdsds',
+            //     'service_type' => 'erter',
+            // ];
         
             $op = $dbHandler->insert('orders', $data);
 

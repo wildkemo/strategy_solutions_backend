@@ -1,9 +1,9 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/../../vendor/autoload.php';
+// require __DIR__ . '/../../vendor/autoload.php';
 
 
 // Enable CORS headers
@@ -20,8 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }  
 
 // Include required files
-require_once '../Models/Order.php';
-require_once '../Models/Database.php';
+
 
 
 
@@ -29,6 +28,9 @@ require_once '../Models/Database.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
+
+        require_once '../Models/Database.php';
+        require_once '../Models/Order.php';
 
         // Read raw input from the request body
         $input = file_get_contents('php://input');
@@ -42,31 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // }
 
 
-        // Validate inputs
-        // if (
-        //     empty($data['name']) ||
-        //     empty($data['email']) ||
-        //     empty($data['phone']) ||
-        //     empty($data['service_type']) ||
-        //     empty($data['service_description'])
-
-        // ) {
-
-        //     http_response_code(400); // Bad Request
-        //     // echo "All fields are required.";
-        //     exit;
-
-        // }
-
-
-        // Extract form data
-        // $Cname = $data['name'];
-        // $Cphone = $data['phone'];
-
-        $Cemail = $data['email'];
-        $Cservice_type = $data['service_type'];
-        $Cservice_description = $data['service_description'];
-
+        
 
         // Initialize the database handler
         $dbHandler = new App\Models\DatabaseHandler(
@@ -86,34 +64,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $order->setServiceDescription($data['service_description']);
         $order->setServiceType($data['service_type']);
 
-        $op = $order->addToDB($database);
+        $op = $order->addToDB($dbHandler);
+
+        // echo json_encode([
+        //     'status' => 'success'
+        // ]);
+        // exit(0);
+
+        // $op =0;
 
         if($op == 0){
             echo json_encode([
                 'status' => 'success'
             ]);
-            exit();
+            exit(0);
         }
         else if($op == 1){
             echo json_encode([
                 'status' => 'error',
                 'message' => 'database error'
             ]);
-            exit();
+            exit(0);
         }
         else if($op == 2){
             echo json_encode([
                 'status' => 'error',
                 'message' => 'user is not registered'
             ]);
-            exit();
+            exit(0);
         }
         else{
             echo json_encode([
                 'status' => 'error',
                 'message' => 'unknown error'
             ]);
-            exit();
+            exit(0);
         }
 
         
