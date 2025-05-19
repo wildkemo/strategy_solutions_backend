@@ -148,6 +148,28 @@ class DatabaseHandler {
     }
 
 
+    public function getAllRecordsWhere(string $tableName, string $column, $value): array {
+        
+        $stmt = $this->pdo->prepare("SELECT * FROM $tableName WHERE $column = :value");
+        $stmt->bindValue(':value', $value);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if($tableName == "services"){
+            // Convert JSON features to PHP arrays
+            foreach ($results as &$row) {
+            if (isset($row['features'])) {
+                $row['features'] = json_decode($row['features'], true);
+            }
+        }
+
+        }
+        
+        return $results;
+    }
+
+
 
     public function getOneValue(string $tableName, string $column, string $whereColumn, $keyvalue): ?string
     {

@@ -1,8 +1,20 @@
 <?php
+session_set_cookie_params([
+    'path'=>'/',
+    'domain'=>'localhost',    // remove this
+    'secure'=>false,       // ok for dev over HTTP
+    'httponly'=>true,
+    'samesite'=>'Lax'      // default Lax lets it send on same‑site navigation
+  ]);
+session_start();
 
-header("Access-Control-Allow-Origin: *"); // Allow all origins (use '*' for testing)
-header("Access-Control-Allow-Methods: POST, OPTIONS"); // Allow POST and preflight OPTIONS requests
+// echo session_id();
+
+
+header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow all origins (use '*' for testing)
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow POST and preflight OPTIONS requests
 header("Access-Control-Allow-Headers: Content-Type"); // Allow JSON content type
+header("Access-Control-Allow-Credentials: true");
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -58,6 +70,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $authentication = $database->authenticateUser("customers", "email", "password", $email, $password);
 
         if($authentication == 0){
+
+            $_SESSION['user_email'] = $email;
+            $_SESSION['logged_in_user'] = true;
+            $_SESSION['logged_in_admin'] = false;
+
             $json_response = [
                 'status' => 'sucess-user',
                 'message' => 'redirect to users page'
@@ -114,12 +131,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $authentication = $database->authenticateUser("admins", "email", "password", $email, $password);
 
         if($authentication == 0){
-            $json_response = [
-                'status' => 'sucess-admin',
-                'message' => 'redirect to admin page'
-            ];
-            echo json_encode($json_response);
-            exit(0);
+
+            $_SESSION['user_email'] = $email;
+            $_SESSION['logged_in_user'] = false;
+            $_SESSION['logged_in_admin'] = true;
+
+            // var_dump($_SESSION);
+
+            if(isset($_SESSION['logged_in_admin'])){
+                $json_response = [
+                    'status' => 'sucess-admin',
+                    'message' => 'redirect to admin page'
+                ];
+                echo json_encode($json_response);
+                exit(0);
+            }
         }
         else if($authentication == 1){
             $json_response = [
