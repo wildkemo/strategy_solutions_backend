@@ -150,15 +150,72 @@ class DatabaseHandler {
 
 
     public function getOneValue(string $tableName, string $column, string $whereColumn, $keyvalue): ?string
+    {
+        $sql = "SELECT $column FROM $tableName WHERE $whereColumn = :keyvalue LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':keyvalue', $keyvalue);
+        $stmt->execute();
+
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $result[$column] ?? null;
+    }
+
+
+
+    
+public function update(string $table, array $data, array $where): int
 {
-    $sql = "SELECT $column FROM $tableName WHERE $whereColumn = :keyvalue LIMIT 1";
+    
+    // Prepare SET part
+    $setParts = [];
+    foreach ($data as $column => $value) {
+        $setParts[] = "{$column} = :set_{$column}";
+    }
+    $setClause = implode(', ', $setParts);
+
+    // Prepare WHERE part
+    $whereParts = [];
+    foreach ($where as $column => $value) {
+        $whereParts[] = "{$column} = :where_{$column}";
+    }
+    $whereClause = implode(' AND ', $whereParts);
+
+    // Build the query
+    $sql = "UPDATE {$table} SET {$setClause} WHERE {$whereClause}";
     $stmt = $this->pdo->prepare($sql);
-    $stmt->bindValue(':keyvalue', $keyvalue);
-    $stmt->execute();
 
-    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    // Bind SET values with proper type handling
+    foreach ($data as $column => $value) {
+        $paramType = \PDO::PARAM_STR; // Default to string
+        
+        if (is_array($value)) {
+            // Convert arrays to JSON strings
+            $value = json_encode($value);
+        } elseif (is_bool($value)) {
+            $paramType = \PDO::PARAM_BOOL;
+        } elseif (is_int($value)) {
+            $paramType = \PDO::PARAM_INT;
+        } elseif (is_null($value)) {
+            $paramType = \PDO::PARAM_NULL;
+        }
+        
+        $stmt->bindValue(":set_{$column}", $value, $paramType);
+    }
 
-    return $result[$column] ?? null;
+    // Bind WHERE values
+    foreach ($where as $column => $value) {
+        $paramType = is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR;
+        $stmt->bindValue(":where_{$column}", $value, $paramType);
+    }
+
+    $op = $stmt->execute();
+    if($op == true){
+        return 0;
+    }
+    else{
+        return 1;
+    }
 }
 
 

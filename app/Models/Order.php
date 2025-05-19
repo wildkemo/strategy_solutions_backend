@@ -68,6 +68,7 @@ public function setServiceDescription(string $service_description): void
                 'email' => $this->getEmail(),
                 'service_description' => $this->getServiceDescription(),
                 'service_type' => $this->getServiceType(),
+                'status' => 'Pending'
             ];
 
             // $data = [

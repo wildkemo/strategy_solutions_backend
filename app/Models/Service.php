@@ -12,6 +12,8 @@ class Service {
     protected $features;
 
     protected $icon;
+    protected $service_status;
+
 
     public function getTitle():string {
         return $this->title;
