@@ -1,9 +1,8 @@
 <?php
 
-// use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
 // use PHPMailer\PHPMailer\Exception;
 
-// require __DIR__ . '/../../vendor/autoload.php';
 
 
 // Enable CORS headers
@@ -73,6 +72,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // $op =0;
 
+        $Cname = $order->getName();
+        $Cemail = $data['email'];
+        $Cservice_type = $data['service_type'];
+        $Cservice_description = $data['service_description'];
+
+
+        // require '/../../vendor/autoload.php';
+        require __DIR__ . '/../../vendor/autoload.php';
+
+        $mail = new PHPMailer(true);
+
+        try {
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'internova.official@gmail.com';
+            $mail->Password   = 'ozps yvxc kepw caxa'; // App Password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+        
+            // Recipients
+            $mail->setFrom('internova.official@gmail.com', 'Strategy Solutions');
+            $mail->addAddress($Cemail, $Cname);
+        
+            // Additional headers
+            $mail->addCustomHeader('X-Mailer', 'PHPMailer');
+            $mail->addCustomHeader('Precedence', 'bulk');
+        
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = 'Your Service Request Confirmation';
+            $mail->Body    = "
+                <h1>Thank You for Your Submission!</h1>
+                <p>Hello $Cname,</p>
+                <p>We have received your service request and will get back to you shortly.</p>
+                <p><strong>Service Type:</strong> $Cservice_type</p>
+                <p><strong>Service Description:</strong> $Cservice_description</p>
+                <p>Best regards,<br>Strategy Solutions</p>
+            ";
+            $mail->AltBody = "Thank you for your submission, $Cname. We have received your service request and will get back to you shortly.";
+        
+            // Send the email
+            $mail->send();
+            $emailSucess = 'true';
+            // echo 'Email sent successfully!';
+        } catch (Exception $e) {
+            // echo "Failed to send email. Error: {$mail->ErrorInfo}";
+            $emailSucess = 'false';
+        }
+
+
+
+
+
+
         if($op == 0){
             echo json_encode([
                 'status' => 'success'
@@ -105,49 +160,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-        ///////////////////// SENDING A MAIL
+        /////////////////// SENDING A MAIL
 
-        // $mail = new PHPMailer(true);
+        
 
-        // try {
-        //     // Server settings
-        //     $mail->isSMTP();
-        //     $mail->Host       = 'smtp.gmail.com';
-        //     $mail->SMTPAuth   = true;
-        //     $mail->Username   = 'internova.official@gmail.com';
-        //     $mail->Password   = 'ozps yvxc kepw caxa'; // App Password
-        //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        //     $mail->Port       = 587;
-        
-        //     // Recipients
-        //     $mail->setFrom('karimelbanna383@gmail.com', 'kemoooo');
-        //     $mail->addAddress($Cemail, $Cname);
-        
-        //     // Additional headers
-        //     $mail->addCustomHeader('X-Mailer', 'PHPMailer');
-        //     $mail->addCustomHeader('Precedence', 'bulk');
-        
-        //     // Content
-        //     $mail->isHTML(true);
-        //     $mail->Subject = 'Your Service Request Confirmation';
-        //     $mail->Body    = "
-        //         <h1>Thank You for Your Submission!</h1>
-        //         <p>Hello $Cname,</p>
-        //         <p>We have received your service request and will get back to you shortly.</p>
-        //         <p><strong>Service Type:</strong> $Cservice_type</p>
-        //         <p><strong>Description:</strong> $Cservice_description</p>
-        //         <p>Best regards,<br>Strategy Solutions</p>
-        //     ";
-        //     $mail->AltBody = "Thank you for your submission, $Cname. We have received your service request and will get back to you shortly.";
-        
-        //     // Send the email
-        //     $mail->send();
-        //     $emailSucess = 'true';
-        //     // echo 'Email sent successfully!';
-        // } catch (Exception $e) {
-        //     // echo "Failed to send email. Error: {$mail->ErrorInfo}";
-        //     $emailSucess = 'false';
-        // }
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Add the customer to the database
         // if ($customer->addToDB($dbHandler)) {
