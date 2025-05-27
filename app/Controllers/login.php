@@ -14,6 +14,7 @@ session_start();
 header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow all origins (use '*' for testing)
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow POST and preflight OPTIONS requests
 header("Access-Control-Allow-Headers: Content-Type"); // Allow JSON content type
+header('Content-Type: application/json');
 header("Access-Control-Allow-Credentials: true");
 
 // Handle preflight OPTIONS request
@@ -30,6 +31,8 @@ require_once '../Models/Database.php';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
+    
+
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
 
@@ -38,6 +41,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         http_response_code(400); // Bad Request
         // echo "Invalid JSON input.";
         exit;
+    }
+
+    if(isset($_SESSION['logged_in_user']) || isset($_SESSION['logged_in_admin'])){
+
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'logout first before you can login again'
+        ]);
+        exit();
     }
 
     if($data['action'] == "login"){
@@ -50,7 +62,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
             $json_response = [
-                'status' => 'fail',
+                'status' => 'error',
                 'message' => 'Invalid Email'
             ];
             echo json_encode($json_response);
@@ -84,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         else if($authentication == 1){
             $json_response = [
-                'status' => 'fail',
+                'status' => 'error',
                 'message' => 'Wrong Password'
             ];
             echo json_encode($json_response);
@@ -92,7 +104,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         else if($authentication == 2){
             $json_response = [
-                'status' => 'fail',
+                'status' => 'error',
                 'message' => 'User does not exist'
             ];
             echo json_encode($json_response);
@@ -111,7 +123,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
             $json_response = [
-                'status' => 'fail',
+                'status' => 'error',
                 'message' => 'Invalid Email'
             ];
             echo json_encode($json_response);
@@ -149,25 +161,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         else if($authentication == 1){
             $json_response = [
-                'status' => 'fail',
+                'status' => 'error',
                 'message' => 'Wrong Password'
             ];
             echo json_encode($json_response);
-            exit(1);
+            exit(0);
         }
         else if($authentication == 2){
             $json_response = [
-                'status' => 'fail',
+                'status' => 'error',
                 'message' => 'User does not exist'
             ];
             echo json_encode($json_response);
-            exit(1);
+            exit(0);
         }
 
     }
     else{
-        http_response_code(400); // Bad Request
-        exit();
+        $json_response = [
+                'status' => 'error',
+                'message' => 'Something went wrong'
+            ];
+            echo json_encode($json_response);
+            exit(0);
     }
 
 

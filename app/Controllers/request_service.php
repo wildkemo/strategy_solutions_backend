@@ -1,4 +1,12 @@
 <?php
+session_set_cookie_params([
+    'path'=>'/',
+    'domain'=>'localhost',    // remove this
+    'secure'=>false,       // ok for dev over HTTP
+    'httponly'=>true,
+    'samesite'=>'Lax'      // default Lax lets it send on same‑site navigation
+  ]);
+session_start();
 
 use PHPMailer\PHPMailer\PHPMailer;
 // use PHPMailer\PHPMailer\Exception;
@@ -6,10 +14,11 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 
 // Enable CORS headers
-header("Access-Control-Allow-Origin: *"); // Allow all origins (use '*' for testing)
-header("Access-Control-Allow-Methods: POST, OPTIONS"); // Allow POST and preflight OPTIONS requests
+header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow all origins (use '*' for testing)
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow POST and preflight OPTIONS requests
 header("Access-Control-Allow-Headers: Content-Type"); // Allow JSON content type
-header("Content-Type: application/json"); // Allow JSON content type
+header('Content-Type: application/json');
+header("Access-Control-Allow-Credentials: true");
 
 
 
@@ -25,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+
 
     try {
 
@@ -42,7 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //     exit;
         // }
 
-
+        if($data['email'] != $_SESSION['user_email']){
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'This is not your email'
+            ]);
+            exit(0);
+        }
         
 
         // Initialize the database handler
@@ -65,12 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $op = $order->addToDB($dbHandler);
 
-        // echo json_encode([
-        //     'status' => 'success'
-        // ]);
-        // exit(0);
+        
 
-        // $op =0;
+
 
         $Cname = $order->getName();
         $Cemail = $data['email'];

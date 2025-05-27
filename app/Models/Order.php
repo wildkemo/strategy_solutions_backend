@@ -7,9 +7,19 @@ class Order {
     protected $email;
     protected $service_type;
     protected $service_description;
+    protected $company_name;
 
+public function getCompanyName(): string 
+{
+    return $this->company_name;
+}
 
-    public function getName(): string 
+public function setCompanyName(string $company_name): void 
+{
+    $this->company_name = $company_name;
+}
+
+public function getName(): string 
 {
     return $this->name;
 }
@@ -60,15 +70,17 @@ public function setServiceDescription(string $service_description): void
         if($exists == true){
 
             $fetchedname = $dbHandler->getOneValue("customers", "name", "email", $this->getEmail());
+            $fetchedCompanyName = $dbHandler->getOneValue("customers", "company_name", "email", $this->getEmail());
             $this->setName($fetchedname);
-
+            $this->setCompanyName($fetchedCompanyName);
            
             $data = [
                 'name' => $this->getName(),
                 'email' => $this->getEmail(),
                 'service_description' => $this->getServiceDescription(),
                 'service_type' => $this->getServiceType(),
-                'status' => 'Pending'
+                'status' => 'Pending',
+                'company_name' => $this->getCompanyName()
             ];
 
             // $data = [
