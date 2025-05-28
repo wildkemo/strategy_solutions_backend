@@ -264,4 +264,22 @@ class DatabaseHandler {
     }
 
 
+
+    public function deleteByString(string $table, string $column, string $value): int
+{
+    $sql = "DELETE FROM {$table} WHERE {$column} = :value";
+    $stmt = $this->pdo->prepare($sql);
+    
+    $stmt->bindValue(':value', $value, \PDO::PARAM_STR);
+    $op = $stmt->execute();
+
+    if($op == true){
+        return 0; // Success
+    }
+    else{
+        return 1; // Failure
+    }
+}
+
+
 }

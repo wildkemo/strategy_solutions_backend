@@ -45,13 +45,22 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 
         $op = $database->update("customers", $data1, $where);
 
+        $data2 = [
+            'name' => $data1['name'],
+            'email' => $_SESSION['user_email'],
+            'company_name' => $data1['company_name']
+        ];
+        $op2 = $database->update("orders", $data2, $where);
+
+        // $op2 = 0;
+
     }else{
         $op = 2;
     }
 
 
     // $op = 0;
-    if($op == 0){
+    if($op == 0 && $op2 == 0){
         echo json_encode([
             'status' => 'success',
             'message' => 'updated successfuly'
@@ -73,6 +82,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         echo json_encode([
             'status' => 'error',
             'message' => 'Wrong Password'
+        ]);
+        // echo $data1;
+        exit();
+    }
+    else{
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Unknown Error'
         ]);
         // echo $data1;
         exit();
